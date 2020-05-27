@@ -242,6 +242,18 @@ def main(args):
     end = time.time()
     fps = num_frames / (end - vibe_time)
 
+    window = 3
+    data = vibe_results[1]['verts']
+    for i in range(num_frames):
+        if i<window:
+            w = data[:i+window+1]
+        elif i+window>=num_frames-1:
+            w = data[i-window:]
+        else:
+            w = data[i-window:i+window+1]
+        data[i] = np.average(w,axis=0)
+    vibe_results[1]['verts'] = data
+
     print(f'VIBE FPS: {fps:.2f}')
     total_time = time.time() - total_time
     print(f'Total time spent: {total_time:.2f} seconds (including model loading time).')
@@ -273,6 +285,7 @@ def main(args):
         for frame_idx in tqdm(range(len(image_file_names))):
             img_fname = image_file_names[frame_idx]
             img = cv2.imread(img_fname)
+            img = np.zeros_like(img)
 
             if args.sideview:
                 side_img = np.zeros_like(img)
